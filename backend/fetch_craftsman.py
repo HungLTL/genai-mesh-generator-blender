@@ -42,3 +42,9 @@ class CraftsManInferrer(ModelInferrer):
         mesh.export(dump_mesh_path)
         print(f"Mesh path: {dump_mesh_path}")
         return str(dump_mesh_path)
+    
+    def __exit__(self, args_dict, modelpath):
+        import gc
+        del self.args_dict
+        del self.inferrer
+        gc.collect()

@@ -178,7 +178,9 @@ paths_exclude_pattern = [
   "env/",
   "download/",
   "update_wheels.py",
+  "huggingface_upload.py",
   "wheels.txt",
   "requirements.txt",
+  "requirements_2.txt",
   "weights/"
 ]

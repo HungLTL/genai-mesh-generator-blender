@@ -40,7 +40,7 @@ class GENAI_PT_OpenLRM(Panel):
         row.prop(props, "mesh_thres")
         
         row = layout.row()
-        row.operator(openlrm_operators.GenAI_OP_OpenLRM_Import_Model_Config.bl_idname)
+        row.operator(openlrm_operators.GenAI_OP_OpenLRM_Import_Config.bl_idname)
         row = layout.row()
         row.operator(openlrm_operators.GenAI_OP_OpenLRMToMesh.bl_idname)
 
@@ -54,7 +54,8 @@ class GENAI_PT_ModelLRM(Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.scene.genai_props_model == 'OPTION_LRM'
+        # return context.scene.genai_props_model == 'OPTION_LRM'
+        return False
     
     def draw(self, context):
         layout = self.layout

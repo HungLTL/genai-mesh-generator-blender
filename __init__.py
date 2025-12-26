@@ -1,8 +1,8 @@
 bl_info = {
     "name": "GenAI Mesh",
     "author": "Lê Trường Long Hưng",
-    "version": (2, 0),
-    "blender": (4, 4, 0),
+    "version": (3, 0),
+    "blender": (4, 2, 0),
     "location": "View3D > Add > Mesh > GenAI > New Object",
     "description": "Open-source integrated 3D Mesh Generator for Blender using generative AI models.",
     "warning": "",

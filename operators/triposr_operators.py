@@ -33,22 +33,22 @@ class GenAI_OP_TripoSRToMesh(Operator):
         if scene.genai_model_path:
             args_dict["pretrained_model_name_or_path"] = scene.genai_model_path
 
-        inferrer = TSRInferrer(args_dict=args_dict)
-        mesh_path = inferrer.run(image=image, format=props.output_mesh_format)
-        
-        if os.path.exists(mesh_path):
-            if props.output_mesh_format == 'OPTION_TSR_GLB':
-                bpy.ops.import_scene.gltf(filepath=mesh_path)
+        with TSRInferrer(args_dict=args_dict) as inferrer:
+            mesh_path = inferrer.run(image=image, format=props.output_mesh_format)
+            
+            if os.path.exists(mesh_path):
+                if props.output_mesh_format == 'OPTION_TSR_GLB':
+                    bpy.ops.import_scene.gltf(filepath=mesh_path)
+                else:
+                    bpy.ops.wm.obj_import(filepath=mesh_path)
+                print('Mesh generation finished.')
+                #del inferrer
+                shutil.rmtree(os.path.dirname(mesh_path))
+                return {'FINISHED'}
             else:
-                bpy.ops.wm.obj_import(filepath=mesh_path)
-            print('Mesh generation finished.')
-            del inferrer
-            shutil.rmtree(os.path.dirname(mesh_path))
-            return {'FINISHED'}
-        else:
-            print('Mesh path not found.')
-            del inferrer
-            return {'CANCELLED'}
+                print('Mesh path not found.')
+                #del inferrer
+                return {'CANCELLED'}
         
 def register():
     bpy.utils.register_class(GenAI_OP_TripoSRToMesh)

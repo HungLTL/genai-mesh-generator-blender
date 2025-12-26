@@ -21,4 +21,9 @@ class OpenLRMInferrer(ModelInferrer):
         print(f"Mesh path: {dump_mesh_path}")
         self.inferrer.infer_single(image,source_cam_dist=None,dump_mesh_path=dump_mesh_path)
         return str(dump_mesh_path)
+    
+    def __exit__(self, args_dict, config_dict, modelpath):
+        import gc
+        del self.inferrer
+        gc.collect()
         

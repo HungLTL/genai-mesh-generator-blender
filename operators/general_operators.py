@@ -24,7 +24,7 @@ class GenAI_OP_Import_Image(Operator, ImportHelper):
         
 class GenAI_OP_Import_HF_Weights(Operator):
     bl_idname = "genai.hf_import_weights"
-    bl_label = "Import HuggingFace Model Weights"
+    bl_label = "Import Weights"
 
     directory: StringProperty(
         name="Directory Path",
@@ -38,9 +38,11 @@ class GenAI_OP_Import_HF_Weights(Operator):
         model_path = self.directory
 
         if (os.path.isdir(model_path)):
+            print("Loading directory at " + model_path)
             scene.genai_model_path = model_path
             return {'FINISHED'}
         else:
+            print("Model directory does not exist!")
             return {'CANCELLED'}
         
     def invoke(self, context, _event):

@@ -117,22 +117,22 @@ class GenAI_OP_OpenLRMToMesh(Operator):
             "encoder_feat_dim": model_props.encoder_feat_dim
         }
 
-        inferrer = OpenLRMInferrer(args_dict=args_dict, config_dict=config_dict,modelpath=model_path)
-        image_name = scene.genai_props_image
-        image = convert_image_utils.bpy_to_pil(bpy.data.images[image_name])
+        with OpenLRMInferrer(args_dict=args_dict, config_dict=config_dict,modelpath=model_path) as inferrer:
+            image_name = scene.genai_props_image
+            image = convert_image_utils.bpy_to_pil(bpy.data.images[image_name])
 
-        # debug_path = "E:\\blender projects\\New folder\\output"
-        mesh_path = inferrer.run(image=image)
-        if os.path.exists(mesh_path):
-            bpy.ops.wm.ply_import(filepath = mesh_path)
-            print('Mesh generation finished.')
-            del inferrer
-            shutil.rmtree(os.path.dirname(mesh_path))
-            return {'FINISHED'}
-        else:
-            print('Mesh path not found.')
-            del inferrer
-            return {'CANCELLED'}
+            # debug_path = "E:\\blender projects\\New folder\\output"
+            mesh_path = inferrer.run(image=image)
+            if os.path.exists(mesh_path):
+                bpy.ops.wm.ply_import(filepath = mesh_path)
+                print('Mesh generation finished.')
+                # del inferrer
+                shutil.rmtree(os.path.dirname(mesh_path))
+                return {'FINISHED'}
+            else:
+                print('Mesh path not found.')
+                # del inferrer
+                return {'CANCELLED'}
 
 classes=[GenAI_OP_OpenLRM_Import_Config, GenAI_OP_OpenLRM_Import_Model_Config, GenAI_OP_OpenLRMToMesh]
             

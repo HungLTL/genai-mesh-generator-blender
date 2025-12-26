@@ -51,25 +51,25 @@ class GenAI_OP_CraftsmanToMesh(Operator):
             "output_type": props.output_type
         }
 
-        inferrer = CraftsManInferrer(args_dict=args_dict,modelpath=model_path)
-        image_name = scene.genai_props_image
-        image = convert_image_utils.bpy_to_pil(bpy.data.images[image_name])
+        with CraftsManInferrer(args_dict=args_dict,modelpath=model_path) as inferrer:
+            image_name = scene.genai_props_image
+            image = convert_image_utils.bpy_to_pil(bpy.data.images[image_name])
 
-        # debug_path = "E:\\blender projects\\New folder\\output"
-        mesh_path = inferrer.run(image=image)
-        if os.path.exists(mesh_path):
-            if props.output_type == 'OPTION_CRAFTSMAN_OBJ':
-                bpy.ops.wm.obj_import(filepath = mesh_path)
+            # debug_path = "E:\\blender projects\\New folder\\output"
+            mesh_path = inferrer.run(image=image)
+            if os.path.exists(mesh_path):
+                if props.output_type == 'OPTION_CRAFTSMAN_OBJ':
+                    bpy.ops.wm.obj_import(filepath = mesh_path)
+                else:
+                    bpy.ops.import_scene.gltf(filepath = mesh_path)
+                print('Mesh generation finished.')
+                #del inferrer
+                shutil.rmtree(os.path.dirname(mesh_path))
+                return {'FINISHED'}
             else:
-                bpy.ops.import_scene.gltf(filepath = mesh_path)
-            print('Mesh generation finished.')
-            del inferrer
-            shutil.rmtree(os.path.dirname(mesh_path))
-            return {'FINISHED'}
-        else:
-            print('Mesh path not found.')
-            del inferrer
-            return {'CANCELLED'}
+                print('Mesh path not found.')
+                #del inferrer
+                return {'CANCELLED'}
 
 classes=[GenAI_OP_CraftsMan_Import_Config, GenAI_OP_CraftsmanToMesh]
             

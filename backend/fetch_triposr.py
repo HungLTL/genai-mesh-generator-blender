@@ -22,3 +22,8 @@ class TSRInferrer(ModelInferrer):
             dump_mesh_path = Path(os.path.join(working_dir, "output.obj"))
         self.inferrer.infer_single(index=0,image=image,path=dump_mesh_path)
         return str(dump_mesh_path)
+    
+    def __exit__(self, args_dict):
+        import gc
+        del self.inferrer
+        gc.collect()
