@@ -55,84 +55,10 @@ class OpenLRMProps(PropertyGroup):
         min=0
     )
 
-class ModelLRMProps(PropertyGroup):
-    camera_embed_dim: IntProperty(
-        name="Camera Embedding Dimension",
-        default=1024,
-        min=0
-    )
-
-    rendering_samples_per_ray: IntProperty(
-        name="Rendering Samples per Ray",
-        default=96,
-        min=0
-    )
-
-    transformer_dim: IntProperty(
-        name="Transformer Dimension",
-        default=512,
-        min=0
-    )
-
-    transformer_layers: IntProperty(
-        name="Transformer Layers",
-        default=12,
-        min=0
-    )
-
-    transformer_heads: IntProperty(
-        name="Transformer Heads",
-        default=8,
-        min=0
-    )
-
-    triplane_low_res: IntProperty(
-        name="Triplane Lowest Resolution",
-        default=32,
-        min=0
-    )
-
-    triplane_high_res: IntProperty(
-        name="Triplane Highest Resolution",
-        default=64,
-        min=0
-    )
-
-    triplane_dim: IntProperty(
-        name="Triplane Dimensions",
-        default=32,
-        min=0
-    )
-
-    encoder_freeze: BoolProperty(
-        name = "Encoder Freeze",
-        default = False
-    )
-
-    encoder_type: StringProperty(
-        name = "Encoder Type",
-        default = "dinov2"
-    )
-
-    encoder_model_name: StringProperty(
-        name = "Encoder Model Name",
-        default = "dinov2_vits14_reg"
-    )
-
-    encoder_feat_dim: IntProperty(
-        name="Encoder Feature Dimensions",
-        default=384,
-        min=0
-    )
-
 def register():
     bpy.utils.register_class(OpenLRMProps)
-    bpy.utils.register_class(ModelLRMProps)
     Scene.genai_props_openlrm = PointerProperty(type=OpenLRMProps)
-    Scene.genai_props_modellrm = PointerProperty(type=ModelLRMProps)
 
 def unregister():
     bpy.utils.unregister_class(OpenLRMProps)
-    bpy.utils.unregister_class(ModelLRMProps)
     del Scene.genai_props_openlrm
-    del Scene.genai_props_modellrm

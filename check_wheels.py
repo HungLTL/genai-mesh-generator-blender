@@ -1,6 +1,6 @@
 import os
 
-new_wheels_dir = "./env/Wheels/"
+new_wheels_dir = "E:/documents backups/OpenLRM/wheels"
 manifest = "wheels.txt"
 
 missing_wheels = []

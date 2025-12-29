@@ -47,3 +47,6 @@
 
 huggingface_upload.py
 update_wheels.py
+check_wheels.py
+requirements_2.txt
+requirements.txt
