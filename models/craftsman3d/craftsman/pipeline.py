@@ -43,6 +43,12 @@ class CraftsManPipeline():
         self.cfg = cfg
         self.system = system
 
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], **kwargs):
         r"""
@@ -186,7 +192,7 @@ class CraftsManPipeline():
         # guidance_scale: float = 7.5,
         # eta: float = 0.0,
         num_meshes_per_prompt: Optional[int] = 1,
-        output_type: Optional[str] = "trimesh",
+        output_type: Optional[str] = "latent",
         return_dict: bool = True,
         seed: Optional[int] = None,
         force_remove_background: bool = False,

@@ -28,7 +28,7 @@ from ....base_inferrer import Inferrer
 from ...datasets.cam_utils import build_camera_principle, create_intrinsics
 from ...utils.logging import configure_logger
 from ...runners import REGISTRY_RUNNERS
-from ...utils.hf_hub import wrap_model_hub, wrap_model_hub_explicit_config
+from ...utils.hf_hub import wrap_model_hub
 
 
 logger = get_logger(__name__)
@@ -94,9 +94,8 @@ def parse_configs():
     assert cfg.model_name is not None, "model_name is required"
     return cfg
 
-def parse_configs(args_dict, config_dict):
+def parse_configs(args_dict):
     assert args_dict, "Cannot pass an empty set of arguments!"
-    assert config_dict, "Cannot pass an empty set of arguments!"
 
     cfg = OmegaConf.create(args_dict)
     assert cfg.model_name is not None, "model_name is required"
@@ -115,42 +114,42 @@ class LRMInferrer(Inferrer):
         super().__init__()
 
         self.cfg = parse_configs()
-        configure_logger(
-            stream_level=self.cfg.logger,
-            log_level=self.cfg.logger,
-        )
+        #configure_logger(
+            #stream_level=self.cfg.logger,
+            #log_level=self.cfg.logger,
+        #)
 
         self.model = self._build_model(self.cfg).to(self.device)
 
-    def __init__(self, args_dict, config_dict, model_path=""):
+    def __init__(self, args_dict, model_path=""):
         super().__init__()
 
-        self.cfg = parse_configs(args_dict, config_dict)
-        configure_logger(
-            stream_level=self.cfg.logger,
-            log_level=self.cfg.logger,
-        )
+        self.cfg = parse_configs(args_dict)
+        #configure_logger(
+            #stream_level=self.cfg.logger,
+            #log_level=self.cfg.logger,
+        #)
 
         # if (preload == True and preload_path != "" and os.path.exists(preload_path)):
             # self.model = self._build_model(preload_path, config_dict).to(self.device)
         # else:
             # self.model = self._build_model(self.cfg).to(self.device)
         if os.path.isdir(model_path):
-            self.model = self._build_model(model_path=model_path).to(self.device)
+            self.model = self._build_model_path(model_path=model_path).to(self.device)
         else:
-            self.model = self._build_model(self.cfg, cfg_dict=config_dict).to(self.device)
+            self.model = self._build_model(self.cfg).to(self.device)
 
-    def _build_model(self, cfg, cfg_dict: dict):
+    def _build_model_path(self, model_path: str):
         from ...models import model_dict
         # hf_model_cls = wrap_model_hub(model_dict[self.EXP_TYPE])
-        hf_model_cls = wrap_model_hub_explicit_config(model_dict[self.EXP_TYPE], cfg_dict)
-        model = hf_model_cls.from_pretrained(cfg.model_name)
-        return model
-    
-    def _build_model(self, model_path: str):
-        from ...models import model_dict
         hf_model_cls = wrap_model_hub(model_dict[self.EXP_TYPE])
         model = hf_model_cls.from_pretrained(pretrained_model_name_or_path=model_path, local_files_only=True)
+        return model
+    
+    def _build_model(self, cfg):
+        from openlrm.models import model_dict
+        hf_model_cls = wrap_model_hub(model_dict[self.EXP_TYPE])
+        model = hf_model_cls.from_pretrained(cfg.model_name)
         return model
 
     def _default_source_camera(self, dist_to_center: float = 2.0, batch_size: int = 1, device: torch.device = torch.device('cpu')):
@@ -222,11 +221,12 @@ class LRMInferrer(Inferrer):
         with torch.no_grad():
             planes = self.infer_planes(image, source_cam_dist=source_cam_dist)
 
-            results = {}
-            mesh = self.infer_mesh(planes, mesh_size=mesh_size, mesh_thres=mesh_thres, dump_mesh_path=dump_mesh_path)
-            results.update({
-                'mesh': mesh,
-            })
+            #results = {}
+            #mesh = self.infer_mesh(planes, mesh_size=mesh_size, mesh_thres=mesh_thres, dump_mesh_path=dump_mesh_path)
+            #results.update({
+                #'mesh': mesh,
+            #})
+            self.infer_mesh(planes, mesh_size=mesh_size, mesh_thres=mesh_thres, dump_mesh_path=dump_mesh_path)
 
     def infer(self):
         pass

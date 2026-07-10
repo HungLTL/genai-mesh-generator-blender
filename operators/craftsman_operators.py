@@ -3,8 +3,9 @@ import shutil
 
 from omegaconf import OmegaConf
 
-from ..backend import CraftsManInferrer
-from ..utils import convert_image_utils
+#from ..backend import CraftsManInferrer
+from ..backend import fetch_and_init_model
+from ..utils import convert_image_utils, mesh_utils
 
 import bpy
 from bpy.types import Operator
@@ -51,9 +52,17 @@ class GenAI_OP_CraftsmanToMesh(Operator):
             "output_type": props.output_type
         }
 
-        with CraftsManInferrer(args_dict=args_dict,modelpath=model_path) as inferrer:
+        #with CraftsManInferrer(args_dict=args_dict,modelpath=model_path) as inferrer:
+        with fetch_and_init_model(model_id=scene.genai_props_model, args_dict=args_dict, modelpath=model_path) as inferrer:
             image_name = scene.genai_props_image
-            image = convert_image_utils.bpy_to_pil(bpy.data.images[image_name])
+            image = convert_image_utils.bpy_to_pil(
+                image=bpy.data.images[image_name],
+                change_background=scene.genai_props_bg_color.bg_correct_enabled,
+                r=scene.genai_props_bg_color.r_value,
+                g=scene.genai_props_bg_color.g_value,
+                b=scene.genai_props_bg_color.b_value,
+                a=scene.genai_props_bg_color.a_value
+            )
 
             # debug_path = "E:\\blender projects\\New folder\\output"
             mesh_path = inferrer.run(image=image)
@@ -62,6 +71,20 @@ class GenAI_OP_CraftsmanToMesh(Operator):
                     bpy.ops.wm.obj_import(filepath = mesh_path)
                 else:
                     bpy.ops.import_scene.gltf(filepath = mesh_path)
+                
+                if (scene.genai_props_post_gen_rot.post_gen_rot
+                    and (scene.genai_props_post_gen_rot.x_value > 0.0
+                         or scene.genai_props_post_gen_rot.y_value > 0.0
+                         or scene.genai_props_post_gen_rot.z_value > 0.0)):
+                    results = context.selected_objects
+                    if (len(results) > 0):
+                        for mesh in results:
+                            mesh_utils.rotate_object(
+                                scene.genai_props_post_gen_rot.x_value,
+                                scene.genai_props_post_gen_rot.y_value,
+                                scene.genai_props_post_gen_rot.z_value,
+                                mesh
+                            )
                 print('Mesh generation finished.')
                 #del inferrer
                 shutil.rmtree(os.path.dirname(mesh_path))

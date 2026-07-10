@@ -50,7 +50,8 @@ class BaseImplicitGeometry(BaseGeometry):
         isosurface_resolution: int = 128
         isosurface_threshold: Union[float, str] = 0.0
         isosurface_chunk: int = 0
-        isosurface_coarse_to_fine: bool = True
+        #isosurface_coarse_to_fine: bool = True
+        isosurface_coarse_to_fine: bool = False
         isosurface_deformable_grid: bool = False
         isosurface_remove_outliers: bool = True
         isosurface_outlier_n_faces_threshold: Union[int, float] = 0.01

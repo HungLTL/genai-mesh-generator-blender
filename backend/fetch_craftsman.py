@@ -9,7 +9,9 @@ from ..models.craftsman3d.craftsman import CraftsManPipeline
 
 class CraftsManInferrer(ModelInferrer):
     def __init__(self, args_dict, modelpath=""):
-        super().__init__()
+        super().__init__(args_dict=args_dict)
+        #self.args_dict = args_dict
+        self.model_path = modelpath
         self.inferrer = CraftsManPipeline.from_pretrained(
             modelpath,
             device="cuda:0",
@@ -18,7 +20,6 @@ class CraftsManInferrer(ModelInferrer):
             guidance_scale=args_dict['guidance_scale'],
             eta=args_dict['eta']
         )
-        self.args_dict = args_dict
 
     def run(self, image: Image, path=""):
         output_name = ""
@@ -32,19 +33,26 @@ class CraftsManInferrer(ModelInferrer):
             dump_mesh_path = Path(os.path.join(working_dir, output_name))
         else:
             dump_mesh_path = os.path.join(path, output_name)
-        
-        mesh = self.inferrer(
-            image=image,
-            foreground_ratio=self.args_dict['foreground_ratio'],
-            mc_depth=self.args_dict['mc_depth'],
-            only_max_component=self.args_dict['only_max_component']
-        ).meshes[0]
-        mesh.export(dump_mesh_path)
-        print(f"Mesh path: {dump_mesh_path}")
-        return str(dump_mesh_path)
+
+        with CraftsManPipeline.from_pretrained(
+            self.model_path,
+            device="cuda:0",
+            torch_dtype=torch.bfloat16,
+            num_inference_steps=self.args_dict['num_inference_steps'],
+            guidance_scale=self.args_dict['guidance_scale'],
+            eta=self.args_dict['eta']
+        ) as inferrer:
+            inferrer(
+                image=image,
+                foreground_ratio=self.args_dict['foreground_ratio'],
+                mc_depth=self.args_dict['mc_depth'],
+                only_max_component=self.args_dict['only_max_component']
+            ).meshes[0].export(dump_mesh_path)
+            print(f"Mesh path: {dump_mesh_path}")
+            return str(dump_mesh_path)
     
-    def __exit__(self, args_dict, modelpath):
+    def __exit__(self, exc_type, exc_value, traceback):
         import gc
         del self.args_dict
-        del self.inferrer
+        del self.model_path
         gc.collect()

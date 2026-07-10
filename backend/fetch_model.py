@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 class ModelInferrer(ABC):
     # fetches the model from the repository
-    def __init__(self, modelpath=""):
-        pass
+    def __init__(self, args_dict, modelpath=""):
+        self.args_dict = args_dict
 
     def __enter__(self):
         return self

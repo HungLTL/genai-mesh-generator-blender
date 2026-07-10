@@ -3,7 +3,7 @@ from bpy.types import (
     Scene, PropertyGroup
 )
 from bpy.props import (
-    FloatProperty, IntProperty, BoolProperty, PointerProperty, EnumProperty
+    IntProperty, BoolProperty, PointerProperty, EnumProperty
 )
 
 class TripoSRProps(PropertyGroup):
@@ -19,6 +19,12 @@ class TripoSRProps(PropertyGroup):
         description="Default: 256",
         default=256,
         min=0
+    )
+
+    is_transparent_bg: BoolProperty(
+        name="Transparent Input",
+        description="If true, input images must have a transparent background.\nIf false, input images must have a solid gray (RGB(128 128 128)) colour. Note that if the subject of the image is also gray, the model might fail to distinguish the subject from the background.\nConsider enabling Background Correction and adjust when needed.",
+        default=True
     )
 
     output_mesh_format: EnumProperty(

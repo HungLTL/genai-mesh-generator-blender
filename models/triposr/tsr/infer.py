@@ -3,11 +3,12 @@ import torch
 # import rembg
 import numpy as np
 
-# from PIL import Image
+from PIL import Image
 from omegaconf import OmegaConf
 
 from ...base_inferrer import Inferrer
 from .system import TSR
+from .utils import resize_foreground
 
 
 def parse_configs(args_dict):
@@ -44,16 +45,13 @@ class TripoSRInferrer(Inferrer):
         return model
 
     def infer_single(self, index, image, path):
-        # if self.args.no_remove_bg:
-        image = np.array(image.convert("RGB"))
-        # else:
-            # rembg_session = rembg.new_session()
-
-            # image = remove_background(image, rembg_session)
-            # image = resize_foreground(image, args.foreground_ratio)
-            # image = np.array(image).astype(np.float32) / 255.0
-            # image = image[:, :, :3] * image[:, :, 3:4] + (1 - image[:, :, 3:4]) * 0.5
-            # image = Image.fromarray((image * 255.0).astype(np.uint8))
+        if self.args.is_transparent_bg:
+            image = resize_foreground(image, 0.85)
+            image = np.array(image).astype(np.float32) / 255.0
+            image = image[:, :, :3] * image[:, :, 3:4] + (1 - image[:, :, 3:4]) * 0.5
+            image = Image.fromarray((image * 255.0).astype(np.uint8))
+        else:
+            image = np.array(image.convert("RGB"))
         
         with torch.no_grad():
             scene_codes = self.model([image], device=self.device)

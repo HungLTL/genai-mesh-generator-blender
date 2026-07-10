@@ -23,10 +23,3 @@ def wrap_model_hub(model_cls: nn.Module):
             super().__init__(**config)
             self.config = config
     return HfModel
-
-def wrap_model_hub_explicit_config(model_cls: nn.Module, config_dict: dict):
-    class HfModel(model_cls, PyTorchModelHubMixin):
-        def __init__(self, config=config_dict):
-            super().__init__(**config)
-            self.config = config
-    return HfModel

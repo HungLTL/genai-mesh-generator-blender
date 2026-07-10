@@ -7,9 +7,20 @@ from bpy.types import Operator
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 
+default_weight_dir = "..weights"
+default_image_dir = "..examples"
+
 class GenAI_OP_Import_Image(Operator, ImportHelper):
     bl_idname = "genai.import"
     bl_label = "Import Image"
+
+    filepath: StringProperty(
+        name="Image Path",
+        default = default_image_dir,
+        description="Image to generate a 3D mesh from",
+        maxlen=1024,
+        subtype='FILE_PATH'
+    )
 
     def execute(self, context):
         scene = context.scene
@@ -28,9 +39,10 @@ class GenAI_OP_Import_HF_Weights(Operator):
 
     directory: StringProperty(
         name="Directory Path",
+        default=default_weight_dir,
         description="Directory containing a subfolder system storing the model",
         maxlen=1024,
-        subtype='DIR_PATH',
+        subtype='DIR_PATH'
     )
 
     def execute(self, context):

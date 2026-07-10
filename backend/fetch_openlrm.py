@@ -7,9 +7,10 @@ from .fetch_model import ModelInferrer
 from ..models.openlrm.runners.infer import LRMInferrer
 
 class OpenLRMInferrer(ModelInferrer):
-    def __init__(self, args_dict, config_dict, modelpath=""):
-        super().__init__()
-        self.inferrer = LRMInferrer(args_dict=args_dict, config_dict=config_dict,model_path=modelpath)
+    def __init__(self, args_dict, modelpath=""):
+        super().__init__(args_dict=args_dict)
+        #self.args_dict = args_dict
+        self.model_path = modelpath
 
     def run(self, image: Image, path=""):
         if not path:
@@ -19,11 +20,17 @@ class OpenLRMInferrer(ModelInferrer):
             dump_mesh_path = os.path.join(path, "output.ply")
 
         print(f"Mesh path: {dump_mesh_path}")
-        self.inferrer.infer_single(image,source_cam_dist=None,dump_mesh_path=dump_mesh_path)
-        return str(dump_mesh_path)
+        with LRMInferrer(self.args_dict, self.model_path) as inferrer:
+            inferrer.infer_single(image,source_cam_dist=None,dump_mesh_path=dump_mesh_path)
+            return str(dump_mesh_path)
     
-    def __exit__(self, args_dict, config_dict, modelpath):
+    def __exit__(self, exc_type, exc_value, traceback):
         import gc
-        del self.inferrer
+        del self.model_path
+        del self.args_dict
         gc.collect()
+        #import gc
+        #del self.inferrer
+        #torch.cuda.memory.empty_cache()
+        #gc.collect()
         
